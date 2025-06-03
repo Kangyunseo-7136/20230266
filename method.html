@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>🔥 조리방식별 레시피</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- 상단 배너 -->
+  <header class="top-banner">
+    <img src="images/banner.jpg" alt="레시피 추천 배너" />
+  </header>
+
+  <!-- 메뉴 -->
+  <nav class="menu">
+    <a href="index.html">🧂 재료로 찾기</a>
+    <a href="time.html">⏱ 시간별</a>
+    <a href="method.html">🔥 조리방식별</a>
+    <a href="situation.html">🎯 상황별</a>
+  </nav>
+
+  <!-- 레시피 카테고리들 -->
+  <div class="section">
+    <h2 onclick="toggleCategory('fry-recipes')">🔥 볶기 레시피</h2>
+    <div id="fry-recipes" style="display: none;"></div>
+  </div>
+
+  <div class="section">
+    <h2 onclick="toggleCategory('boil-recipes')">🥘 끓이기 레시피</h2>
+    <div id="boil-recipes" style="display: none;"></div>
+  </div>
+
+  <div class="section">
+    <h2 onclick="toggleCategory('nofire-recipes')">🥗 불 사용하지 않는 레시피</h2>
+    <div id="nofire-recipes" style="display: none;"></div>
+  </div>
+
+  <div class="section">
+    <h2 onclick="toggleCategory('grill-recipes')">🍳 굽는 레시피</h2>
+    <div id="grill-recipes" style="display: none;"></div>
+  </div>
+
+  <!-- 레시피 데이터 연결 -->
+  <script src="js/recipes.js"></script>
+
+  <script>
+    const fryList = allRecipes.filter(r => r.method === "볶음");
+    const boilList = allRecipes.filter(r => r.method === "끓임");
+    const nofireList = allRecipes.filter(r => r.method === "불없음");
+    const grillList = allRecipes.filter(r => r.method === "굽기");
+
+    function renderRecipeList(containerId, recipeList) {
+      const container = document.getElementById(containerId);
+      if (!container || !recipeList.length) {
+        container.innerHTML = "<p>해당 조리방식 레시피가 없습니다.</p>";
+        return;
+      }
+
+      container.innerHTML = recipeList.map((r, index) => `
+        <div class="recipe-item">
+          <div class="recipe-header" onclick="toggleRecipe('${containerId}-${index}')">
+            🔍 <strong>${r.name}</strong>
+          </div>
+          <div class="recipe-details" id="recipe-${containerId}-${index}" style="display: none;">
+            <p><strong>📝 조리 방법</strong><br>${r.instructions.replace(/\n/g, "<br>")}</p>
+          </div>
+          <div><small>${r.ingredients.join(', ')}</small></div>
+        </div>
+      `).join('');
+    }
+
+    function toggleRecipe(id) {
+      const el = document.getElementById(`recipe-${id}`);
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    }
+
+    function toggleCategory(id) {
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    }
+
+    renderRecipeList("fry-recipes", fryList);
+    renderRecipeList("boil-recipes", boilList);
+    renderRecipeList("nofire-recipes", nofireList);
+    renderRecipeList("grill-recipes", grillList);
+  </script>
+
+</body>
+</html>
