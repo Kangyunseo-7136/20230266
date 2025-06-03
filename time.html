@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>⏱ 시간별 레시피</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- 상단 배너 (옵션) -->
+  <header class="top-banner">
+    <img src="images/banner.jpg" alt="레시피 추천 배너" />
+  </header>
+
+  <!-- 메뉴 -->
+  <nav class="menu">
+    <a href="index.html">🧂 재료로 찾기</a>
+    <a href="time.html">⏱ 시간별</a>
+    <a href="method.html">🔥 조리방식별</a>
+    <a href="situation.html">🎯 상황별</a>
+  </nav>
+
+  <h1>⏱ 시간별 레시피</h1>
+
+  <div class="section">
+    <h2 onclick="toggleSection('under5')">⏰ 5분 이하 레시피</h2>
+    <div id="under5" class="recipe-list" style="display: none;"></div>
+  </div>
+
+  <div class="section">
+    <h2 onclick="toggleSection('under10')">⏰ 10분 이하 레시피</h2>
+    <div id="under10" class="recipe-list" style="display: none;"></div>
+  </div>
+
+  <div class="section">
+    <h2 onclick="toggleSection('under20')">⏰ 20분 이하 레시피</h2>
+    <div id="under20" class="recipe-list" style="display: none;"></div>
+  </div>
+
+  <div class="section">
+    <h2 onclick="toggleSection('over20')">⏰ 20분 초과 레시피</h2>
+    <div id="over20" class="recipe-list" style="display: none;"></div>
+  </div>
+
+  <!-- 레시피 데이터 연결 -->
+  <script src="js/recipes.js"></script>
+
+  <script>
+    function getTimeCategory(recipe) {
+      const match = recipe.time.match(/\d+/);
+      const time = match ? parseInt(match[0]) : 0;
+      if (time <= 5) return 'under5';
+      if (time <= 10) return 'under10';
+      if (time <= 20) return 'under20';
+      return 'over20';
+    }
+
+    function toggleSection(id) {
+      const el = document.getElementById(id);
+      el.style.display = (el.style.display === "none") ? "block" : "none";
+    }
+
+    function renderRecipeList(containerId, recipes) {
+      const container = document.getElementById(containerId);
+      if (!recipes.length) {
+        container.innerHTML = "<p>레시피가 없습니다.</p>";
+        return;
+      }
+
+      container.innerHTML = recipes.map((r, i) => `
+        <div class="recipe-item">
+          <div class="recipe-header" onclick="toggleRecipe('${containerId}-${i}')">
+            🍽 <strong>${r.name}</strong>
+          </div>
+          <div class="recipe-details" id="recipe-${containerId}-${i}" style="display: none;">
+            <p><strong>📝 조리 방법</strong><br>${r.instructions.replace(/\n/g, "<br>")}</p>
+            <p><strong>재료</strong>: ${r.ingredients.join(", ")}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleRecipe(id) {
+      const el = document.getElementById(`recipe-${id}`);
+      el.style.display = (el.style.display === "none") ? "block" : "none";
+    }
+
+    const under5 = [], under10 = [], under20 = [], over20 = [];
+
+    allRecipes.forEach(recipe => {
+      const category = getTimeCategory(recipe);
+      if (category === 'under5') under5.push(recipe);
+      else if (category === 'under10') under10.push(recipe);
+      else if (category === 'under20') under20.push(recipe);
+      else over20.push(recipe);
+    });
+
+    renderRecipeList("under5", under5);
+    renderRecipeList("under10", under10);
+    renderRecipeList("under20", under20);
+    renderRecipeList("over20", over20);
+  </script>
+
+</body>
+</html>
