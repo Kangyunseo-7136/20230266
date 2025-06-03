@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🎯 상황별 레시피</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    #meal-rice, #meal-noodles, #meal-soups, #meal-etc {
+      display: none;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="menu">
+    <a href="index.html">🧂 재료로 찾기</a>
+    <a href="time.html">⏱ 시간별</a>
+    <a href="method.html">🔥 조리방식별</a>
+    <a href="situation.html">🎯 상황별</a>
+  </nav>
+
+  <h1>🎯 상황별 레시피</h1>
+
+  <section class="section">
+    <h2 onclick="toggleSection('sick-recipes')">🌙 아픈 날</h2>
+    <div id="sick-recipes" class="hidden"></div>
+  </section>
+
+  <section class="section">
+    <h2 onclick="toggleSection('diet-recipes')">🍃 다이어트</h2>
+    <div id="diet-recipes" class="hidden"></div>
+  </section>
+
+  <section class="section">
+    <h2>🍚 한 끼 식사</h2>
+    <label><input type="checkbox" onchange="toggleMealType(this, 'meal-rice', mealRice)" /> 밥</label>
+    <label><input type="checkbox" onchange="toggleMealType(this, 'meal-noodles', mealNoodles)" /> 면</label>
+    <label><input type="checkbox" onchange="toggleMealType(this, 'meal-soups', mealSoups)" /> 국/찌개</label>
+    <label><input type="checkbox" onchange="toggleMealType(this, 'meal-etc', mealEtc)" /> 기타</label>
+
+    <div id="meal-rice"></div>
+    <div id="meal-noodles"></div>
+    <div id="meal-soups"></div>
+    <div id="meal-etc"></div>
+  </section>
+
+  <section class="section">
+    <h2 onclick="toggleSection('snack-recipes')">🍘 반찬</h2>
+    <div id="snack-recipes" class="hidden"></div>
+  </section>
+
+  <script src="js/recipes.js"></script>
+  <script>
+    function toggleSection(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle("hidden");
+    }
+
+    function toggleRecipe(id) {
+      const el = document.getElementById(`recipe-${id}`);
+      if (!el) return;
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    }
+
+    function toggleMealType(checkbox, id, recipeList) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (checkbox.checked) {
+        if (!el.innerHTML.trim()) {
+          renderRecipeList(id, recipeList);
+        }
+        el.style.display = "block";
+      } else {
+        el.style.display = "none";
+      }
+    }
+
+    // 데이터 필터링
+    const sickList = allRecipes.filter(r => r.situation === "아픈날");
+    const dietList = allRecipes.filter(r => r.situation === "다이어트");
+    const morningList = allRecipes.filter(r => r.situation === "간단한 아침");
+    const snackList = allRecipes.filter(r => r.situation === "간식/반찬");
+    const mealNoodles = allRecipes.filter(r => r.situation === "한끼식사" && r.mealType === "면");
+    const mealSoups = allRecipes.filter(r => r.situation === "한끼식사" && r.mealType === "국/찌개");
+    const mealRice = allRecipes.filter(r => r.situation === "한끼식사" && r.mealType === "밥");
+    const mealEtc = allRecipes.filter(r => r.situation === "한끼식사" && r.mealType === "기타");
+
+    function renderRecipeList(containerId, recipeList) {
+      const container = document.getElementById(containerId);
+      if (!container || !recipeList.length) {
+        container.innerHTML = "<p>레시피가 없습니다.</p>";
+        return;
+      }
+
+      container.innerHTML = recipeList.map((r, index) => `
+        <div class="recipe-item">
+          <div class="recipe-header" onclick="toggleRecipe('${containerId}-${index}')">
+            🍽 <strong>${r.name}</strong>
+          </div>
+          <div class="recipe-details" id="recipe-${containerId}-${index}" style="display: none;">
+            <p><strong>재료:</strong> ${r.ingredients.join(', ')}</p>
+            <p><strong>방법:</strong><br>${r.instructions.replace(/\n/g, "<br>")}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.onload = function () {
+      renderRecipeList("sick-recipes", sickList);
+      renderRecipeList("diet-recipes", dietList);
+      renderRecipeList("morning-recipes", morningList);
+      renderRecipeList("snack-recipes", snackList);
+    };
+  </script>
+</body>
+</html>
